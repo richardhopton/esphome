@@ -147,15 +147,12 @@ void IDFUARTComponent::dump_config() {
 void IDFUARTComponent::write_array(const uint8_t *data, size_t len) {
   xSemaphoreTake(this->lock_, portMAX_DELAY);
   if (this->half_duplex_) {
-    esp_err_t err = uart_set_pin(this->uart_num_, this->active_pin_, this->idle_pin_, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+    esp_err_t err =
+        uart_set_pin(this->uart_num_, this->active_pin_, this->idle_pin_, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
     if (err != ESP_OK) {
       ESP_LOGW(TAG, "uart_set_pin failed: %s", esp_err_to_name(err));
       this->mark_failed();
     }
-    uart_set_baudrate(this->uart_num_, this->baud_rate_ / 2);
-    uart_write_bytes(this->uart_num_, "", 1);
-    uart_wait_tx_idle_polling(this->uart_num_);
-    delay(10);
     uart_set_baudrate(this->uart_num_, this->baud_rate_);
     uart_write_bytes(this->uart_num_, data, len);
     uart_wait_tx_idle_polling(this->uart_num_);
